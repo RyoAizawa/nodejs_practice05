@@ -57,6 +57,7 @@ footer .footer-textarea {
 select {
     padding: 5px;
     border-color: #aaa;
+    margin-right: 10px;
 }
 
 /*-------------------------

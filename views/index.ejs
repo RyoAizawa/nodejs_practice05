@@ -18,8 +18,19 @@
                     並べ替え
                     <select id="sortSelect">
                         <option value="" disabled selected>選択してください</option>
+                        <option value="base">標準</option>
                         <option value="ratingHi">評価が高い順</option>
                         <option value="ratingLow">評価が低い順</option>
+                    </select>
+                    絞り込み
+                    <select id="searchRating">
+                        <option value="" disabled selected>選択してください</option>
+                        <option value="base">標準</option>
+                        <option value="ratingOne">評価１</option>
+                        <option value="ratingTwo">評価２</option>
+                        <option value="ratingThree">評価３</option>
+                        <option value="ratingFour">評価４</option>
+                        <option value="ratingFive">評価５</option>
                     </select>
             </div>
             <div id="reviewArea"></div>
@@ -31,6 +42,7 @@
             const personasOrg = JSON.parse('<%= JSON.stringify(personas) %>'.replace(/&#34;/g, '"'));
             const reviewArea  = document.querySelector("#reviewArea")
             const sortSelect  = document.querySelector("#sortSelect")
+            const searchRating  = document.querySelector("#searchRating")
 
             // ページ読み込み時は初期値を出力
             window.onload = () => {
@@ -38,29 +50,62 @@
             };
 
             // 並べ替えを選択された場合のソート処理
-            sortSelect.addEventListener("change", () => {
-                // ユーザー情報をコピー
-                const sortedArr = JSON.parse(JSON.stringify(personasOrg))
+            sortSelect.addEventListener("change", sortAndSearchList)
+            searchRating.addEventListener("change", sortAndSearchList)
+
+            /*
+                ソート、検索用関数
+                並べ替えを維持したまま検索、検索を維持したまま並べ替えを行えるよう
+                ソート関数内で検索処理も実行する
+            */
+            function sortAndSearchList() {
+                // 絞り込み済みリストの取得
+                const filteredArr = searchList(personasOrg)
+                // 選択項目順にソート
                 for(const option of sortSelect.options) {
                     if(option.selected) {
                         if(option.value === "ratingHi") {
-                            sortedArr.sort((a, b) => {
+                            filteredArr.sort((a, b) => {
                                 return b.rating - a.rating;
                             });
                         } else if(option.value === "ratingLow") {
-                            sortedArr.sort((a, b) => {
+                            filteredArr.sort((a, b) => {
                                 return a.rating - b.rating;
                             });
                         }
                     }
                 }
-                // ソートした結果のオブジェクトでリストを再作成
-                createTableData(sortedArr);
-            })
+                // ソート済みのリストでブラウザ出力
+                createTableData(filteredArr);
+            }
+
+            // 選択された項目で絞り込まれたリストを返す関数
+            function searchList(personasOrg) {
+                // 絞り込み済みリスト
+                const searchArr = []
+                for(const option of searchRating.options) {
+                    if(option.selected) {
+                        personasOrg.map((elem) => {
+                            // 選択した評価値と一致する要素は絞り込み済みリストへプッシュ
+                            if((option.value === "ratingOne" && elem.rating === 1)
+                            || (option.value === "ratingTwo" && elem.rating === 2)
+                            || (option.value === "ratingThree" && elem.rating === 3)
+                            || (option.value === "ratingFour" && elem.rating === 4)
+                            || (option.value === "ratingFive" && elem.rating === 5)) {
+                                searchArr.push(elem)
+                            }
+                            // 標準が選択された場合は無条件で要素を絞り込み済みリストへプッシュ
+                            else if(option.value === "base") searchArr.push(elem)
+                        })
+                    }
+                }
+                // 絞り込み済みリストを返す
+                return searchArr
+            }
 
             /*
             ブラウザに出力するデータを作成するメソッド
-                personasObj...作成するユーザーのオブジェクト群
+                personasObj...ブラウザ出力するデータ群
             */
             function createTableData(personasObj) {
                 // リストは都度初期化

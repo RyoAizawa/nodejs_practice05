@@ -14,6 +14,16 @@
             <h1>商品レビューページ</h1>
         </header>
         <main>
+            <div class="user-action-area">
+                <p>
+                    並べ替え
+                    <select id="sortSelect">
+                        <option value="" disabled selected>選択してください</option>
+                        <option value="ratingHi">評価が高い順</option>
+                        <option value="ratingLow">評価が低い順</option>
+                    </select>
+                </p>
+            </div>
             <div id="reviewArea"></div>
         </main>
         <footer>
@@ -22,12 +32,32 @@
         <script>
             const personasOrg = JSON.parse('<%= JSON.stringify(personas) %>'.replace(/&#34;/g, '"'));
             const reviewArea  = document.querySelector("#reviewArea")
+            const sortSelect  = document.querySelector("#sortSelect")
+
             // ページ読み込み時は初期値を出力
             window.onload = () => {
                 createTableData(personasOrg);
             };
+            sortSelect.addEventListener("change", () => {
+                const sortedArr = personasOrg.concat()
+                for(const option of sortSelect.options) {
+                    if(option.selected) {
+                        if(option.value === "ratingHi") {
+                            sortedArr.sort((a, b) => {
+                                return b.rating - a.rating;
+                            });
+                        } else if(option.value === "ratingLow") {
+                            sortedArr.sort((a, b) => {
+                                return a.rating - b.rating;
+                            });
+                        }
+                    }
+                }
+                createTableData(sortedArr);
+            })
+
             /*
-            リストに出力するデータを作成するメソッド
+            ブラウザに出力するデータを作成するメソッド
                 personasObj...作成するユーザーのオブジェクト群
             */
             function createTableData(personasObj) {

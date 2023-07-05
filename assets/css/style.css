@@ -44,6 +44,18 @@ footer .footer-textarea {
 }
 
 /*-------------------------
+    ユーザー操作領域
+-------------------------*/
+.user-action-area {
+    width: 100%;
+    background-color: #f6f6f6;
+    position: relative;
+}
+.user-action-area p {
+    padding: 20px;
+}
+
+/*-------------------------
     レビュー出力領域
 -------------------------*/
 .review-contentarea {

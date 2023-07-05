@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>商品レビュー</title>
+        <meta name="description" content="">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="./css/style.css">
+    </head>
+    <body>
+        <header>
+            <h1>商品レビューページ</h1>
+        </header>
+        <main>
+            <% for(const person of personas) { %>
+                <div class="review-contentarea">
+                    <div class="review-user">
+                        <p><img src="https://placehold.jp/80x80.png" alt=""></p>
+                        <p><%= person.username %>さん<span class="age"><%= person.age %>歳</span></p>
+                    </div>
+                    <div class="review-content">
+                        <div class="rating-area">
+                            <% if(person.rating === 1) { %>
+                                <p>&#9733;&#9734;&#9734;&#9734;&#9734;
+                            <% } else if(person.rating === 2) { %>
+                                <p>&#9733;&#9733;&#9734;&#9734;&#9734;
+                            <% } else if(person.rating === 3) { %>
+                                <p>&#9733;&#9733;&#9733;&#9734;&#9734;
+                            <% } else if(person.rating === 4) { %>
+                                <p>&#9733;&#9733;&#9733;&#9733;&#9734;
+                            <% } else if(person.rating === 5) { %>
+                                <p>&#9733;&#9733;&#9733;&#9733;&#9733;
+                            <% } %>
+                            <span><%= person.rating %></span></p>
+                        </div>
+                        <p><%= person.reason %></p>
+                    </div>
+                </div>
+            <% } %>
+        </main>
+        <footer>
+            <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+        </footer>
+
+        <script>
+        </script>
+    </body>
+</html>

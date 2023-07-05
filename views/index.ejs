@@ -15,14 +15,12 @@
         </header>
         <main>
             <div class="user-action-area">
-                <p>
                     並べ替え
                     <select id="sortSelect">
                         <option value="" disabled selected>選択してください</option>
                         <option value="ratingHi">評価が高い順</option>
                         <option value="ratingLow">評価が低い順</option>
                     </select>
-                </p>
             </div>
             <div id="reviewArea"></div>
         </main>
@@ -38,8 +36,11 @@
             window.onload = () => {
                 createTableData(personasOrg);
             };
+
+            // 並べ替えを選択された場合のソート処理
             sortSelect.addEventListener("change", () => {
-                const sortedArr = personasOrg.concat()
+                // ユーザー情報をコピー
+                const sortedArr = JSON.parse(JSON.stringify(personasOrg))
                 for(const option of sortSelect.options) {
                     if(option.selected) {
                         if(option.value === "ratingHi") {
@@ -53,6 +54,7 @@
                         }
                     }
                 }
+                // ソートした結果のオブジェクトでリストを再作成
                 createTableData(sortedArr);
             })
 

@@ -16,8 +16,7 @@
         <main>
             <div class="graph-contents-area">
                 <p>年代別グラフ</p>
-                <table class="graph-table" id="graphTable">
-                </table>
+                <table class="graph-table" id="graphTable"></table>
             </div>
             <div class="user-action-area">
                     並べ替え
@@ -46,10 +45,20 @@
         <script>
             const personasOrg = JSON.parse('<%= JSON.stringify(personas) %>'.replace(/&#34;/g, '"'));
             const reviewArea  = document.querySelector("#reviewArea")
+            // 「並べ替え」のセレクトボックス
             const sortSelect  = document.querySelector("#sortSelect")
+            // 「絞り込み」のセレクトボックス
             const searchRating  = document.querySelector("#searchRating")
+            // 年代別グラフを描画するテーブル
             const graphTable = document.querySelector("#graphTable")
 
+            // ページ読み込み時は初期値を出力
+            window.onload = () => {
+                createTableData(personasOrg);
+                drawingGraph();
+            };
+
+            // 各年代別のグラフを描画する関数
             function drawingGraph() {
                 // 各年代別の人数をカウントする変数
                 const ageArr = ["10代", "20代", "30代", "40代", "50代以上"]
@@ -60,13 +69,12 @@
                     const meterArea  = document.createElement("td")
                     const meter      = document.createElement("div")
                     const total      = document.createElement("td")
-
+                    // クラス属性の付与
                     meterArea.classList.add("graph-meter-area")
                     meter.classList.add("graph-meter")
-
                     // データの取得
                     ageTd.innerHTML = age
-
+                    // 年代別に人数をカウント
                     let count = 0;
                     personasOrg.forEach((person) => {
                         if(age === "10代") {
@@ -87,22 +95,17 @@
                         }
                     })
                     total.innerHTML = `${count}件 `
+                    // メーターの幅プロパティに「総人数/年代人数*100」で割合を設定
                     meter.style.width = `${Math.floor((count / personasOrg.length) * 100)}%`
-
-                    console.log(meter)
+                    // テーブル行の完成
                     meterArea.append(meter)
                     tableRow.append(ageTd)
                     tableRow.append(meterArea)
                     tableRow.append(total)
+                    // ブラウザに出力
                     graphTable.append(tableRow)
                 })
             }
-
-            // ページ読み込み時は初期値を出力
-            window.onload = () => {
-                createTableData(personasOrg);
-                drawingGraph();
-            };
 
             // 並べ替えを選択された場合のソート処理
             sortSelect.addEventListener("change", sortAndSearchList)

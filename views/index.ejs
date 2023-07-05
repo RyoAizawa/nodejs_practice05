@@ -14,6 +14,11 @@
             <h1>商品レビューページ</h1>
         </header>
         <main>
+            <div class="graph-contents-area">
+                <p>年代別グラフ</p>
+                <table class="graph-table" id="graphTable">
+                </table>
+            </div>
             <div class="user-action-area">
                     並べ替え
                     <select id="sortSelect">
@@ -43,10 +48,60 @@
             const reviewArea  = document.querySelector("#reviewArea")
             const sortSelect  = document.querySelector("#sortSelect")
             const searchRating  = document.querySelector("#searchRating")
+            const graphTable = document.querySelector("#graphTable")
+
+            function drawingGraph() {
+                // 各年代別の人数をカウントする変数
+                const ageArr = ["10代", "20代", "30代", "40代", "50代以上"]
+                ageArr.forEach((age) => {
+                    // 要素の作成
+                    const tableRow   = document.createElement("tr")
+                    const ageTd      = document.createElement("td")
+                    const meterArea  = document.createElement("td")
+                    const meter      = document.createElement("div")
+                    const total      = document.createElement("td")
+
+                    meterArea.classList.add("graph-meter-area")
+                    meter.classList.add("graph-meter")
+
+                    // データの取得
+                    ageTd.innerHTML = age
+
+                    let count = 0;
+                    personasOrg.forEach((person) => {
+                        if(age === "10代") {
+                            // 10歳以上20歳未満（10代）
+                            if(person.age >= 10 && person.age < 20) count++
+                        } else if(age === "20代") {
+                            // 20歳以上30歳未満（20代）
+                            if(person.age >= 20 && person.age < 30) count++
+                        } else if(age === "30代"){
+                            // 30歳以上40歳未満（30代）
+                            if(person.age >= 30 && person.age < 40) count++
+                        } else if(age === "40代"){
+                            // 40歳以上50歳未満（40代）
+                            if(person.age >= 40 && person.age < 50) count++
+                        } else if(age === "50代以上"){
+                            // 50歳以上
+                            if(person.age >= 50) count++
+                        }
+                    })
+                    total.innerHTML = `${count}件 `
+                    meter.style.width = `${Math.floor((count / personasOrg.length) * 100)}%`
+
+                    console.log(meter)
+                    meterArea.append(meter)
+                    tableRow.append(ageTd)
+                    tableRow.append(meterArea)
+                    tableRow.append(total)
+                    graphTable.append(tableRow)
+                })
+            }
 
             // ページ読み込み時は初期値を出力
             window.onload = () => {
                 createTableData(personasOrg);
+                drawingGraph();
             };
 
             // 並べ替えを選択された場合のソート処理

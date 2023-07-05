@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>商品レビュー</title>
         <meta name="description" content="">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
         <link rel="stylesheet" href="./css/style.css">
     </head>
     <body>
@@ -14,37 +14,88 @@
             <h1>商品レビューページ</h1>
         </header>
         <main>
-            <% for(const person of personas) { %>
-                <div class="review-contentarea">
-                    <div class="review-user">
-                        <p><img src="https://placehold.jp/80x80.png" alt=""></p>
-                        <p><%= person.username %>さん<span class="age"><%= person.age %>歳</span></p>
-                    </div>
-                    <div class="review-content">
-                        <div class="rating-area">
-                            <% if(person.rating === 1) { %>
-                                <p>&#9733;&#9734;&#9734;&#9734;&#9734;
-                            <% } else if(person.rating === 2) { %>
-                                <p>&#9733;&#9733;&#9734;&#9734;&#9734;
-                            <% } else if(person.rating === 3) { %>
-                                <p>&#9733;&#9733;&#9733;&#9734;&#9734;
-                            <% } else if(person.rating === 4) { %>
-                                <p>&#9733;&#9733;&#9733;&#9733;&#9734;
-                            <% } else if(person.rating === 5) { %>
-                                <p>&#9733;&#9733;&#9733;&#9733;&#9733;
-                            <% } %>
-                            <span><%= person.rating %></span></p>
-                        </div>
-                        <p><%= person.reason %></p>
-                    </div>
-                </div>
-            <% } %>
+            <div id="reviewArea"></div>
         </main>
         <footer>
             <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
         </footer>
-
         <script>
+            const personasOrg = JSON.parse('<%= JSON.stringify(personas) %>'.replace(/&#34;/g, '"'));
+            const reviewArea  = document.querySelector("#reviewArea")
+            // ページ読み込み時は初期値を出力
+            window.onload = () => {
+                createTableData(personasOrg);
+            };
+            /*
+            リストに出力するデータを作成するメソッド
+                personasObj...作成するユーザーのオブジェクト群
+            */
+            function createTableData(personasObj) {
+                // リストは都度初期化
+                while(reviewArea.firstChild) {
+                    reviewArea.firstChild.remove()
+                }
+                // 渡されたオブジェクトの分だけリストデータの作成
+                personasObj.map((person) => {
+                    // ユーザー情報表示領域の作成
+                    const reviewUser    = document.createElement("div")
+                    const userImgParag  = document.createElement("p")
+                    const userImg       = document.createElement("img")
+                    const usernameParag = document.createElement("p")
+                    const age           = document.createElement("span")
+                    // 各要素へ属性の付与
+                    reviewUser.classList.add("review-user")
+                    userImg.setAttribute("src", "https://placehold.jp/80x80.png")
+                    age.classList.add("age")
+                    // ユーザーの名前と年齢を受け取る
+                    usernameParag.innerHTML = `${person.username}さん`
+                    age.innerHTML           = `${person.age}歳`
+                    // ユーザー情報表示領域の完成
+                    userImgParag.append(userImg)
+                    usernameParag.append(age)
+                    reviewUser.append(userImgParag)
+                    reviewUser.append(usernameParag)
+
+                    // レビュー表示領域領域の作成
+                    const reviewContent = document.createElement("div")
+                    const ratingArea    = document.createElement("div")
+                    const ratingParag   = document.createElement("p")
+                    const ratingSpan    = document.createElement("span")
+                    const reason = document.createElement("p")
+                    // 各要素へ属性の付与
+                    reviewContent.classList.add("review-content")
+                    ratingArea.classList.add("rating-area")
+                    // ユーザー評価に合わせて星を設定
+                    const rating = person.rating
+                    if(person.rating === 1) {
+                        ratingParag.innerHTML = `&#9733;&#9734;&#9734;&#9734;&#9734`
+                    } else if(person.rating === 2) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9734;&#9734;&#9734`
+                    } else if(person.rating === 3) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9734;&#9734`
+                    } else if(person.rating === 4) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9734`
+                    } else if(person.rating === 5) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
+                    }
+                    ratingSpan.innerHTML = person.rating
+                    reason.innerHTML = person.reason
+                    // レビュー表示領域の完成
+                    ratingParag.append(ratingSpan)
+                    ratingArea.append(ratingParag)
+                    reviewContent.append(ratingArea)
+                    reviewContent.append(reason)
+
+                    // 各領域を内包する要素の作成
+                    const contentWrapper = document.createElement("div")
+                    contentWrapper.classList.add("review-contentarea")
+                    contentWrapper.append(reviewUser)
+                    contentWrapper.append(reviewContent)
+                    // ブラウザへ出力
+                    reviewArea.append(contentWrapper)
+                })
+            }
+
         </script>
     </body>
 </html>

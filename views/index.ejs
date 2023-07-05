@@ -58,6 +58,10 @@
                 drawingGraph();
             };
 
+            // 並べ替えを選択された場合のソート処理
+            sortSelect.addEventListener("change", sortAndSearchList)
+            searchRating.addEventListener("change", sortAndSearchList)
+
             // 各年代別のグラフを描画する関数
             function drawingGraph() {
                 // 各年代別の人数をカウントする変数
@@ -107,10 +111,6 @@
                 })
             }
 
-            // 並べ替えを選択された場合のソート処理
-            sortSelect.addEventListener("change", sortAndSearchList)
-            searchRating.addEventListener("change", sortAndSearchList)
-
             /*
                 ソート、検索用関数
                 並べ替えを維持したまま検索、検索を維持したまま並べ替えを行えるよう
@@ -153,7 +153,7 @@
                                 searchArr.push(elem)
                             }
                             // 標準が選択された場合は無条件で要素を絞り込み済みリストへプッシュ
-                            else if(option.value === "base") searchArr.push(elem)
+                            else if(option.value === "base" || option.value === "") searchArr.push(elem)
                         })
                     }
                 }

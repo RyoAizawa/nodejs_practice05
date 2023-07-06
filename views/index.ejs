@@ -202,7 +202,8 @@
                     const ratingArea    = document.createElement("div")
                     const ratingParag   = document.createElement("p")
                     const ratingSpan    = document.createElement("span")
-                    const reason = document.createElement("p")
+                    const reason        = document.createElement("p")
+                    const editLink      = document.createElement("a")
                     // 各要素へ属性の付与
                     reviewContent.classList.add("review-content")
                     ratingArea.classList.add("rating-area")
@@ -220,13 +221,21 @@
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
                     }
                     ratingSpan.innerHTML = person.rating
+
+                    // 改行を含む文字列の場合、改行コードをbrタグに変換する
+                    if(person.reason.match("\n") !== null ) {
+                        person.reason = person.reason.replace(/\n/g, "<br>")
+                    }
                     reason.innerHTML = person.reason
+                    editLink.innerHTML = "レビューを編集する"
+                    editLink.classList.add("edit-Link")
+                    editLink.setAttribute("href",`/edit/${person.id}`)
                     // レビュー表示領域の完成
                     ratingParag.append(ratingSpan)
                     ratingArea.append(ratingParag)
                     reviewContent.append(ratingArea)
                     reviewContent.append(reason)
-
+                    reviewContent.append(editLink)
                     // 各領域を内包する要素の作成
                     const contentWrapper = document.createElement("div")
                     contentWrapper.classList.add("review-contentarea")

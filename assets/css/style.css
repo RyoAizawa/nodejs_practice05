@@ -98,6 +98,7 @@ select {
     height: 80px;
 }
 .review-content {
+    position: relative;
     width: 75%;
     border-left: 1px dotted #ccc;
     padding: 10px 50px;
@@ -108,6 +109,11 @@ select {
 .rating-area {
     color: rgb(241, 193, 37);
     font-size: 2.4rem;
+}
+.edit-Link {
+    position: absolute;
+    bottom: 0;
+    right: 20px;
 }
 
 /*-------------------------

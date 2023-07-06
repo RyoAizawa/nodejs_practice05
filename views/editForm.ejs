@@ -4,63 +4,68 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>レビューを投稿する | 商品レビュー</title>
+        <title>レビュー内容編集 | 商品レビュー</title>
         <meta name="description" content="">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
-        <link rel="stylesheet" href="./css/style.css">
+        <link rel="stylesheet" href="../css/style.css">
     </head>
     <body>
         <header>
             <h1><a href="/">商品レビューページ</a></h1>
         </header>
         <main>
-            <h2>レビューを投稿する</h2>
-            <form action="/post" method="post" class="review-form" novalidate>
+            <h2>レビュー内容を編集する</h2>
+            <form action="/update/<%= person[0].id %>" method="post" class="review-form" novalidate>
                 <table>
                     <tr>
                         <td>
                             <h3>お名前<span class="error" id="nameError"></span></h3>
-                            <input type="text" name="username">
+                            <input type="text" name="username" value="<%= person[0].username %>">
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <h3>ご年齢<span class="error" id="ageError"></span></h3>
-                            <input type="text" name="age" id="age">
+                            <input type="text" name="age" id="age" value="<%= person[0].age %>">
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <h3>評価<span class="error" id="ratingError"></span></h3>
-                            <select name="rating" id="rating">
-                                <option value="" disabled selected>選択してください</option>
-                                <option value="1">評価１</option>
-                                <option value="2">評価２</option>
-                                <option value="3">評価３</option>
-                                <option value="4">評価４</option>
-                                <option value="5">評価５</option>
+                            <select name="rating" id="rating" selected="<%= person[0].rating %>">
+                                <option value="" disabled>選択してください</option>
+                                <option value="1" <% if(person[0].rating===1) { %> selected <% } %>> 評価１</option>
+                                <option value="2" <% if(person[0].rating===2) { %> selected <% } %>> 評価２</option>
+                                <option value="3" <% if(person[0].rating===3) { %> selected <% } %>> 評価３</option>
+                                <option value="4" <% if(person[0].rating===4) { %> selected <% } %>> 評価４</option>
+                                <option value="5" <% if(person[0].rating===5) { %> selected <% } %>> 評価５</option>
                             </select>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <h3>レビュー内容<span class="error" id="reasonError"></span></h3>
-                            <textarea name="reason"></textarea>
+                            <textarea name="reason"><%= person[0].reason %></textarea>
                         </td>
                     </tr>
                 </table>
-                <button type="submit">投稿</button>
+                <button type="submit">送信</button>
             </form>
         </main>
         <footer>
             <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
         </footer>
         <script type="module">
-            import FormValidation from './script/FormValidation.js'
+            import FormValidation from '../script/FormValidation.js'
             // 投稿ボタンが押された際のバリデーションチェック
             document.querySelector("button[type='submit']").addEventListener("click", (event) => {
                 FormValidation()
             })
+
+            const reason = document.querySelector("textarea[name='reason']")
+            // テキストエリアは改行コードを\nから\r\nに変換
+            reason.value = (reason.value).replace(/\\n/g, '\r\n')
+
         </script>
     </body>
 </html>

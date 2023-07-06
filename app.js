@@ -25,19 +25,43 @@ app.get("/", (req, res) => {
     const sql = "SELECT * FROM personas";
     con.query(sql, function (err, result, fields) {
         if (err) throw err;
-        console.log(result)
         res.render("index", {personas: result})
+    });
+});
+
+// 更新フォーム選択時
+app.get("/edit/:id", (req, res) => {
+    const sql = "SELECT * FROM personas WHERE id = ?";
+    con.query(sql, req.params.id, function (err, result, fields) {
+        if (err) throw err;
+        res.render("editForm", {person: result})
     });
 });
 
 app.get("/post", (req, res) => {res.render("postForm")});
 
 // 新規レビュー追加フォーム送信
-app.post("/", (req, res) => {
+app.post("/post", (req, res) => {
     const sql = "INSERT INTO personas SET ?"
     con.query(sql, req.body, function (err, result, fields) {
         if (err) throw err;
-        console.log(result)
+        res.redirect("/");
+    })
+})
+
+// 新規レビュー追加フォーム送信
+app.post("/update/:id", (req, res) => {
+    req.body.reason = convert(req.body.reason);
+    console.log(req.body)
+    function convert(jsonString) {
+        return jsonString
+            .replace(/(\r\n)/g, '\n')
+            .replace(/(\r)/g, '\n')
+            .replace(/(\n)/g, '\\n')
+    }
+    const sql = "UPDATE personas SET ? WHERE id = " + req.params.id;
+    con.query(sql, req.body, function (err, result, fields) {
+        if (err) throw err;
         res.redirect("/");
     })
 })

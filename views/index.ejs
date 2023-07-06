@@ -7,11 +7,12 @@
         <title>商品レビュー</title>
         <meta name="description" content="">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="./css/style.css">
     </head>
     <body>
         <header>
-            <h1>商品レビューページ</h1>
+            <h1><a href="/">商品レビューページ</a></h1>
         </header>
         <main>
             <div class="graph-contents-area">
@@ -19,23 +20,28 @@
                 <table class="graph-table" id="graphTable"></table>
             </div>
             <div class="user-action-area">
-                    並べ替え
-                    <select id="sortSelect">
-                        <option value="" disabled selected>選択してください</option>
-                        <option value="base">標準</option>
-                        <option value="ratingHi">評価が高い順</option>
-                        <option value="ratingLow">評価が低い順</option>
-                    </select>
-                    絞り込み
-                    <select id="searchRating">
-                        <option value="" disabled selected>選択してください</option>
-                        <option value="base">標準</option>
-                        <option value="ratingOne">評価１</option>
-                        <option value="ratingTwo">評価２</option>
-                        <option value="ratingThree">評価３</option>
-                        <option value="ratingFour">評価４</option>
-                        <option value="ratingFive">評価５</option>
-                    </select>
+                    <div>
+                        並べ替え
+                        <select id="sortSelect">
+                            <option value="" disabled selected>選択してください</option>
+                            <option value="base">標準</option>
+                            <option value="ratingHi">評価が高い順</option>
+                            <option value="ratingLow">評価が低い順</option>
+                        </select>
+                        絞り込み
+                        <select id="searchRating">
+                            <option value="" disabled selected>選択してください</option>
+                            <option value="base">標準</option>
+                            <option value="ratingOne">評価１</option>
+                            <option value="ratingTwo">評価２</option>
+                            <option value="ratingThree">評価３</option>
+                            <option value="ratingFour">評価４</option>
+                            <option value="ratingFive">評価５</option>
+                        </select>
+                    </div>
+                    <div class="review-post">
+                        <a href="/post"><i class="fa fa-pencil" aria-hidden="true"></i>レビューを投稿する</a>
+                    </div>
             </div>
             <div id="reviewArea"></div>
         </main>

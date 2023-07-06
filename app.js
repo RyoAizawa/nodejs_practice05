@@ -30,4 +30,16 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/post", (req, res) => {res.render("postForm")});
+
+// 新規レビュー追加フォーム送信
+app.post("/", (req, res) => {
+    const sql = "INSERT INTO personas SET ?"
+    con.query(sql, req.body, function (err, result, fields) {
+        if (err) throw err;
+        console.log(result)
+        res.redirect("/");
+    })
+})
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

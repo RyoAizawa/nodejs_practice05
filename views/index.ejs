@@ -24,9 +24,9 @@
                         並べ替え
                         <select id="sortSelect">
                             <option value="" disabled selected>選択してください</option>
-                            <option value="base">標準</option>
-                            <option value="ratingHi">評価が高い順</option>
-                            <option value="ratingLow">評価が低い順</option>
+                            <option value="base" <% if (order === "base") { %> selected <% } %>> 標準</option>
+                            <option value="desc" <% if (order === "desc") { %> selected <% } %>> 評価が高い順</option>
+                            <option value="asc"  <% if (order === "asc") { %> selected <% } %>> 評価が低い順</option>
                         </select>
                         絞り込み
                         <select id="searchRating">
@@ -65,8 +65,19 @@
             };
 
             // 並べ替えを選択された場合のソート処理
-            sortSelect.addEventListener("change", sortAndSearchList)
-            searchRating.addEventListener("change", sortAndSearchList)
+            sortSelect.addEventListener("change", () => {
+                let order = ""
+                for(option of sortSelect.options) {
+                    if (option.selected) {
+                        order = option.value
+                    }
+                }
+                // ソートしたユーザー情報でindexをレンダリングする
+                location.assign(`/${order}`)
+            })
+
+            // 絞り込みを選択された場合の処理
+            searchRating.addEventListener("change",searchList)
 
             // 各年代別のグラフを描画する関数
             function drawingGraph() {
@@ -117,34 +128,8 @@
                 })
             }
 
-            /*
-                ソート、検索用関数
-                並べ替えを維持したまま検索、検索を維持したまま並べ替えを行えるよう
-                ソート関数内で検索処理も実行する
-            */
-            function sortAndSearchList() {
-                // 絞り込み済みリストの取得
-                const filteredArr = searchList(personasOrg)
-                // 選択項目順にソート
-                for(const option of sortSelect.options) {
-                    if(option.selected) {
-                        if(option.value === "ratingHi") {
-                            filteredArr.sort((a, b) => {
-                                return b.rating - a.rating;
-                            });
-                        } else if(option.value === "ratingLow") {
-                            filteredArr.sort((a, b) => {
-                                return a.rating - b.rating;
-                            });
-                        }
-                    }
-                }
-                // ソート済みのリストでブラウザ出力
-                createTableData(filteredArr);
-            }
-
             // 選択された項目で絞り込まれたリストを返す関数
-            function searchList(personasOrg) {
+            function searchList() {
                 // 絞り込み済みリスト
                 const searchArr = []
                 for(const option of searchRating.options) {
@@ -163,8 +148,8 @@
                         })
                     }
                 }
-                // 絞り込み済みリストを返す
-                return searchArr
+                // ソート済みのリストでブラウザ出力
+                createTableData(searchArr);
             }
 
             /*

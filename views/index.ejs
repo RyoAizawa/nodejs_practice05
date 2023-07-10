@@ -25,18 +25,18 @@
                         <select id="sortSelect">
                             <option value="" disabled selected>選択してください</option>
                             <option value="base" <% if (order === "base") { %> selected <% } %>> 標準</option>
-                            <option value="desc" <% if (order === "desc") { %> selected <% } %>> 評価が高い順</option>
-                            <option value="asc"  <% if (order === "asc") { %> selected <% } %>> 評価が低い順</option>
+                            <option value="rating:desc" <% if (order === "desc") { %> selected <% } %>> 評価が高い順</option>
+                            <option value="rating:asc"  <% if (order === "asc") { %> selected <% } %>> 評価が低い順</option>
                         </select>
                         絞り込み
                         <select id="searchRating">
                             <option value="" disabled selected>選択してください</option>
-                            <option value="base">標準</option>
-                            <option value="ratingOne">評価１</option>
-                            <option value="ratingTwo">評価２</option>
-                            <option value="ratingThree">評価３</option>
-                            <option value="ratingFour">評価４</option>
-                            <option value="ratingFive">評価５</option>
+                            <option value="base"<% if(search === "base") {%> selected <% } %>>標準</option>
+                            <option value="rating:1" <% if(search === "1") {%> selected <% } %>>評価１</option>
+                            <option value="rating:2" <% if(search === "2") {%> selected <% } %>>評価２</option>
+                            <option value="rating:3" <% if(search === "3") {%> selected <% } %>>評価３</option>
+                            <option value="rating:4" <% if(search === "4") {%> selected <% } %>>評価４</option>
+                            <option value="rating:5" <% if(search === "5") {%> selected <% } %>>評価５</option>
                         </select>
                     </div>
                     <div class="review-post">
@@ -49,7 +49,9 @@
             <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
         </footer>
         <script>
-            const personasOrg = JSON.parse('<%= JSON.stringify(personas) %>'.replace(/&#34;/g, '"'));
+            const filteredPersonas = JSON.parse('<%= JSON.stringify(filteredPersonas) %>'.replace(/&#34;/g, '"'));
+            // グラフ描画用に全ユーザー分の情報を取得
+            const personasOrg = JSON.parse('<%= JSON.stringify(personasOrg) %>'.replace(/&#34;/g, '"'));
             const reviewArea  = document.querySelector("#reviewArea")
             // 「並べ替え」のセレクトボックス
             const sortSelect  = document.querySelector("#sortSelect")
@@ -60,27 +62,51 @@
 
             // ページ読み込み時は初期値を出力
             window.onload = () => {
-                createTableData(personasOrg);
-                drawingGraph();
+                createTableData(filteredPersonas);
+                drawingGraph(personasOrg);
             };
 
             // 並べ替えを選択された場合のソート処理
-            sortSelect.addEventListener("change", () => {
+            sortSelect.addEventListener("change", sortAndSearchSelect)
+            // 絞り込みを選択された場合の処理
+            searchRating.addEventListener("change", sortAndSearchSelect)
+
+            /*
+                並べ替えもしくは絞り込みを選択された場合のメソッド
+            */
+            function sortAndSearchSelect() {
+                let res = ""
+                let filterObj = []
+                // 絞り込みの値
+                let search = ""
+                // ソートの値
                 let order = ""
+                // ソートに選択された値を検索
                 for(option of sortSelect.options) {
-                    if (option.selected) {
-                        order = option.value
+                    if (option.selected && option.value !== "") {
+                        filterObj["order"] = option.value
                     }
                 }
+                // 絞り込みに選択された値を検索
+                for(option of searchRating.options) {
+                    if (option.selected && option.value !== "") {
+                        filterObj["search"] = option.value
+                    }
+                }
+                // 「order=rating:asc」「search=rating:1」のような形に
+                const filterArray = Object.keys(filterObj).map(function (key) {
+                    return [`${key}=${filterObj[key]}`];
+                });
+                // 複数あれば、「order=asc+search=1」のような形に変換、なければカンマは削除
+                filterArray.length > 1 ? res = filterArray.join("+") : res = filterArray.join("")
                 // ソートしたユーザー情報でindexをレンダリングする
-                location.assign(`/${order}`)
-            })
+                location.assign(`/${res}`)
+            }
 
-            // 絞り込みを選択された場合の処理
-            searchRating.addEventListener("change",searchList)
-
-            // 各年代別のグラフを描画する関数
-            function drawingGraph() {
+            /*
+                各年代別のグラフを描画するメソッド
+            */
+            function drawingGraph(personasObj) {
                 // 各年代別の人数をカウントする変数
                 const ageArr = ["10代", "20代", "30代", "40代", "50代以上"]
                 ageArr.forEach((age) => {
@@ -97,7 +123,7 @@
                     ageTd.innerHTML = age
                     // 年代別に人数をカウント
                     let count = 0;
-                    personasOrg.forEach((person) => {
+                    personasObj.forEach((person) => {
                         if(age === "10代") {
                             // 10歳以上20歳未満（10代）
                             if(person.age >= 10 && person.age < 20) count++
@@ -117,7 +143,7 @@
                     })
                     total.innerHTML = `${count}件 `
                     // メーターの幅プロパティに「総人数/年代人数*100」で割合を設定
-                    meter.style.width = `${Math.floor((count / personasOrg.length) * 100)}%`
+                    meter.style.width = `${Math.floor((count / personasObj.length) * 100)}%`
                     // テーブル行の完成
                     meterArea.append(meter)
                     tableRow.append(ageTd)
@@ -126,30 +152,6 @@
                     // ブラウザに出力
                     graphTable.append(tableRow)
                 })
-            }
-
-            // 選択された項目で絞り込まれたリストを返す関数
-            function searchList() {
-                // 絞り込み済みリスト
-                const searchArr = []
-                for(const option of searchRating.options) {
-                    if(option.selected) {
-                        personasOrg.map((elem) => {
-                            // 選択した評価値と一致する要素は絞り込み済みリストへプッシュ
-                            if((option.value === "ratingOne" && elem.rating === 1)
-                            || (option.value === "ratingTwo" && elem.rating === 2)
-                            || (option.value === "ratingThree" && elem.rating === 3)
-                            || (option.value === "ratingFour" && elem.rating === 4)
-                            || (option.value === "ratingFive" && elem.rating === 5)) {
-                                searchArr.push(elem)
-                            }
-                            // 標準が選択された場合は無条件で要素を絞り込み済みリストへプッシュ
-                            else if(option.value === "base" || option.value === "") searchArr.push(elem)
-                        })
-                    }
-                }
-                // ソート済みのリストでブラウザ出力
-                createTableData(searchArr);
             }
 
             /*

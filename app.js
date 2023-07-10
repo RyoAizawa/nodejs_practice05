@@ -28,7 +28,12 @@ app.get("/", (req, res) => {
     const sql = "SELECT * FROM personas";
     con.query(sql, function (err, result, fields) {
         if (err) throw err;
-        res.render("index", { personas: result , order: "" });
+        res.render("index", {
+            personasOrg: result,
+            filteredPersonas: result,
+            order: "",
+            search: ""
+        });
     });
 });
 
@@ -70,18 +75,55 @@ app.post("/update/:id", (req, res) => {
     });
 });
 
-// ソートを選択された場合の処理
-app.get("/:order", (req, res) => {
-    console.log(req.params.order)
-    let sql = "";
-    // 標準の場合は全てのユーザー情報を返す
-    if (req.params.order === "base") sql = "SELECT * FROM personas";
-    // 順番が選択されている場合は昇順か降順か指定する
-    else sql = "SELECT * FROM personas ORDER BY rating "+ req.params.order;
+// ソート、絞り込みを選択された場合の処理
+app.get("/:filter", (req, res) => {
+
+    let order = ""
+    let search = ""
+    let orderQuery = ""
+    let searchQuery = ""
+    let personasOrg = []
+    const filter = req.params.filter.split("+")
+
+    // ソート、絞り込みの選択肢が格納されている分だけ処理繰り返し
+    filter.forEach((elem) => {
+        if (elem.indexOf("order") > -1) {
+            // 「order=rating:asc」という形から=の後の記述のみ取得する
+            const selectOrder = elem.slice(elem.indexOf("=") + 1)
+            if (elem.indexOf("rating") > -1) {
+                // 「asc」という形のみ取得する。
+                order = selectOrder.slice(selectOrder.indexOf(":") + 1)
+                if (order !== "base") orderQuery = `ORDER BY rating ${order}`
+            }
+            else if (selectOrder === "base") order = "base"
+        } else if (elem.indexOf("search") > -1) {
+            // 「search=rating:1」という形から=の後の記述のみ取得する
+            const selectSearch = elem.slice(elem.indexOf("=") + 1)
+            if (elem.indexOf("rating") > -1) {
+                // 「1」という形のみ取得する。
+                search = selectSearch.slice(selectSearch.indexOf(":") + 1)
+                if (search !== "base") searchQuery = `WHERE rating = ${search}`
+            }
+            else if (selectSearch === "base") search = "base"
+        }
+    });
+    // グラフ描画用に全てのユーザー情報も取得しておく
+    let sql = `SELECT * FROM personas`;
     con.query(sql, function (err, result, fields) {
         if (err) throw err;
-        // ソートされたユーザー情報と順番の情報を返す
-        res.render("index", { personas: result , order: req.params.order});
+        personasOrg = result;
+    });
+    // 検索結果を反映した情報を取得
+    sql = `SELECT * FROM personas ${searchQuery} ${orderQuery}`;
+    con.query(sql, function (err, result, fields) {
+        if (err) throw err;
+        // ソートされたユーザー情報と順番,絞り込みの情報を返す
+        res.render("index", {
+            personasOrg: personasOrg,
+            filteredPersonas: result,
+            order: order,
+            search: search
+        });
     });
 });
 

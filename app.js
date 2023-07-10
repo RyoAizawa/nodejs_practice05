@@ -21,6 +21,9 @@ const con = mysql.createConnection({
 // 外部静的ファイルの取得
 app.use(express.static("assets"));
 
+// favicon.icoがリクエストされた場合、空のレスポンスを返す。
+app.get("/favicon.ico", (req, res) => {res.status(204);})
+
 app.get("/", (req, res) => {
     const sql = "SELECT * FROM personas";
     con.query(sql, function (err, result, fields) {
@@ -54,7 +57,6 @@ app.post("/post", (req, res) => {
 // 新規レビュー追加フォーム送信
 app.post("/update/:id", (req, res) => {
     req.body.reason = convert(req.body.reason);
-    console.log(req.body);
     function convert(jsonString) {
         return jsonString
             .replace(/(\r\n)/g, "\n")
